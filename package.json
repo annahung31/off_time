@@ -18,7 +18,8 @@
       "perMachine": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "下班倒數"
+      "shortcutName": "下班倒數",
+      "compression": "maximum"
     },
     "files": [
       "index.html",
