@@ -462,12 +462,7 @@
 
 <div class="header" id="drag-region">
   <div class="logo">⬡ Work Timer</div>
-  <div style="display:flex;align-items:center;gap:0.6rem;">
-    <div class="status-dot" id="dot"></div>
-    <button class="win-btn" id="pin-btn" title="釘選置頂" onclick="togglePin()">📌</button>
-    <button class="win-btn" onclick="winMinimize()">—</button>
-    <button class="win-btn" onclick="winClose()">✕</button>
-  </div>
+  <div class="status-dot" id="dot"></div>
 </div>
 
 <div class="app">
@@ -555,10 +550,7 @@
   let remaining = 0;
   let interval = null;
   let paused = false;
-  const CIRC = 2 * Math.PI * 88; // ≈ 552.92
-
   const display    = document.getElementById('display');
-  const ring       = document.getElementById('ring');
   const progFill   = document.getElementById('prog-fill');
   const dot        = document.getElementById('dot');
   const pauseBtn   = document.getElementById('pause-btn');
@@ -625,9 +617,6 @@
 
 
 
-    // ring
-    ring.style.strokeDashoffset = CIRC * (1 - pct);
-
     // progress bar
     const pctRound = Math.round(pct * 100);
     progFill.style.width = pctRound + '%';
@@ -663,7 +652,6 @@
     setupPanel.style.display = 'flex';
     pauseBtn.textContent = '暫停';
     display.textContent = '00:00:00';
-    ring.style.strokeDashoffset = CIRC;
     progFill.style.width = '0%';
   }
 

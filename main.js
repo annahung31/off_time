@@ -6,8 +6,8 @@ let tray;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 380,
-    height: 520,
+    width: 500,
+    height: 200,
     frame: false,
     transparent: false,
     resizable: true,
