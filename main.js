@@ -47,7 +47,7 @@ app.whenReady().then(() => {
 });
 
 ipcMain.on('minimize', () => { if (win) win.minimize(); });
-ipcMain.on('close',    () => { if (win) win.hide(); });
+ipcMain.on('close',    () => { if (win) win.close(); });
 ipcMain.on('pin',      (_, pinned) => { if (win) win.setAlwaysOnTop(pinned); });
 
 app.on('window-all-closed', () => {

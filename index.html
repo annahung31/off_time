@@ -592,7 +592,11 @@
     end.setHours(h, m, 0, 0);
 
     totalSeconds = Math.floor((end - now) / 1000);
-    if (totalSeconds <= 0) { alert('下班時間已過！請輸入未來的時間。'); return; }
+    if (totalSeconds <= 0) {
+      // Time already passed today — schedule for tomorrow
+      end.setDate(end.getDate() + 1);
+      totalSeconds = Math.floor((end - now) / 1000);
+    }
 
     endTimestamp = end.getTime();
     endTimeLbl.textContent = `${pad(h)}:${pad(m)}`;
@@ -601,8 +605,9 @@
     timerPanel.style.display = 'flex';
     dot.classList.add('running');
 
-    tick();
+    // Set interval before calling tick() so clearInterval works correctly on first call
     interval = setInterval(tick, 1000);
+    tick();
   }
 
   function tick() {
