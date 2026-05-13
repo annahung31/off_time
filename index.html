@@ -549,21 +549,39 @@
 </div>
 
 <script>
-  let endTimestamp = 0;   // Date.now() of when work ends
-  let totalSeconds  = 0;
-  let interval      = null;
-  let paused        = false;
-  let pausedAt      = 0;  // timestamp when paused
-  const display    = document.getElementById('display');
-  const progFill   = document.getElementById('prog-fill');
-  const dot        = document.getElementById('dot');
-  const pauseBtn   = document.getElementById('pause-btn');
-  const elapsedLbl = document.getElementById('elapsed-label');
-  const remainLbl  = document.getElementById('remain-label');
-  const endTimeLbl = document.getElementById('end-time-label');
-  const setupPanel = document.getElementById('setup-panel');
-  const timerPanel = document.getElementById('timer-panel');
-  const doneOverlay= document.getElementById('done-overlay');
+  let endTimestamp = 0;
+  let totalSeconds = 0;
+  let paused       = false;
+  let pausedAt     = 0;
+
+  const display     = document.getElementById('display');
+  const progFill    = document.getElementById('prog-fill');
+  const dot         = document.getElementById('dot');
+  const pauseBtn    = document.getElementById('pause-btn');
+  const elapsedLbl  = document.getElementById('elapsed-label');
+  const remainLbl   = document.getElementById('remain-label');
+  const endTimeLbl  = document.getElementById('end-time-label');
+  const setupPanel  = document.getElementById('setup-panel');
+  const timerPanel  = document.getElementById('timer-panel');
+  const doneOverlay = document.getElementById('done-overlay');
+
+  // Web Worker timer — runs in a separate thread, immune to main-thread throttling
+  const _workerSrc = `
+    var _id = null;
+    self.onmessage = function(e) {
+      if (e.data === 'start') {
+        clearInterval(_id);
+        _id = setInterval(function() { self.postMessage('tick'); }, 1000);
+      } else {
+        clearInterval(_id);
+        _id = null;
+      }
+    };
+  `;
+  const _worker = new Worker(
+    URL.createObjectURL(new Blob([_workerSrc], { type: 'application/javascript' }))
+  );
+  _worker.onmessage = () => tick();
 
   function setPreset(h, m) {
     document.getElementById('input-h').value = h;
@@ -606,7 +624,7 @@
     dot.classList.add('running');
 
     // Set interval before calling tick() so clearInterval works correctly on first call
-    interval = setInterval(tick, 1000);
+    _worker.postMessage('start');
     tick();
   }
 
@@ -622,34 +640,30 @@
     remainLbl.textContent  = `剩餘 ${100 - pctRound}%`;
 
     if (rem <= 0) {
-      clearInterval(interval);
-      interval = null;
+      _worker.postMessage('stop');
       done();
     }
   }
 
   function togglePause() {
     if (!paused) {
-      clearInterval(interval);
-      interval = null;
+      _worker.postMessage('stop');
       paused = true;
       pausedAt = Date.now();
       pauseBtn.textContent = '繼續';
       dot.classList.remove('running');
     } else {
-      // Shift endTimestamp forward by the paused duration
       endTimestamp += Date.now() - pausedAt;
       paused = false;
       pauseBtn.textContent = '暫停';
       dot.classList.add('running');
+      _worker.postMessage('start');
       tick();
-      interval = setInterval(tick, 1000);
     }
   }
 
   function resetTimer() {
-    clearInterval(interval);
-    interval = null;
+    _worker.postMessage('stop');
     paused = false;
     endTimestamp = 0;
     dot.classList.remove('running','done');

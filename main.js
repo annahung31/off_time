@@ -26,7 +26,10 @@ function createWindow() {
 
   win.loadFile('index.html');
 
-  // Drag region via custom title bar
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12') win.webContents.openDevTools({ mode: 'detach' });
+  });
+
   win.on('closed', () => { win = null; });
 }
 
