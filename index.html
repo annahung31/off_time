@@ -549,10 +549,11 @@
 </div>
 
 <script>
-  let totalSeconds = 0;
-  let remaining = 0;
-  let interval = null;
-  let paused = false;
+  let endTimestamp = 0;   // Date.now() of when work ends
+  let totalSeconds  = 0;
+  let interval      = null;
+  let paused        = false;
+  let pausedAt      = 0;  // timestamp when paused
   const display    = document.getElementById('display');
   const progFill   = document.getElementById('prog-fill');
   const dot        = document.getElementById('dot');
@@ -593,7 +594,7 @@
     totalSeconds = Math.floor((end - now) / 1000);
     if (totalSeconds <= 0) { alert('下班時間已過！請輸入未來的時間。'); return; }
 
-    remaining = totalSeconds;
+    endTimestamp = end.getTime();
     endTimeLbl.textContent = `${pad(h)}:${pad(m)}`;
 
     setupPanel.style.display = 'none';
@@ -605,28 +606,21 @@
   }
 
   function tick() {
-    if (remaining <= 0) {
-      clearInterval(interval);
-      interval = null;
-      done();
-      return;
-    }
+    const rem = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
 
-    const pct = 1 - remaining / totalSeconds;
-    const elapsed = totalSeconds - remaining;
+    display.textContent = fmt(rem);
 
-    // display
-    display.textContent = fmt(remaining);
-
-
-
-    // progress bar
+    const pct = 1 - rem / totalSeconds;
     const pctRound = Math.round(pct * 100);
     progFill.style.width = pctRound + '%';
     elapsedLbl.textContent = `已過 ${pctRound}%`;
     remainLbl.textContent  = `剩餘 ${100 - pctRound}%`;
 
-    remaining--;
+    if (rem <= 0) {
+      clearInterval(interval);
+      interval = null;
+      done();
+    }
   }
 
   function togglePause() {
@@ -634,12 +628,16 @@
       clearInterval(interval);
       interval = null;
       paused = true;
+      pausedAt = Date.now();
       pauseBtn.textContent = '繼續';
       dot.classList.remove('running');
     } else {
+      // Shift endTimestamp forward by the paused duration
+      endTimestamp += Date.now() - pausedAt;
       paused = false;
       pauseBtn.textContent = '暫停';
       dot.classList.add('running');
+      tick();
       interval = setInterval(tick, 1000);
     }
   }
@@ -648,7 +646,7 @@
     clearInterval(interval);
     interval = null;
     paused = false;
-    remaining = 0;
+    endTimestamp = 0;
     dot.classList.remove('running','done');
     doneOverlay.classList.remove('show');
     timerPanel.style.display = 'none';
