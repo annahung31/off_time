@@ -11,8 +11,7 @@
     "appId": "com.bye.timer",
     "productName": "下班倒數",
     "win": {
-      "target": "nsis",
-      "icon": "icon.ico"
+      "target": "nsis"
     },
     "nsis": {
       "oneClick": true,
