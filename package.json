@@ -13,13 +13,13 @@
     "win": {
       "target": "nsis"
     },
+    "compression": "maximum",
     "nsis": {
       "oneClick": true,
       "perMachine": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "下班倒數",
-      "compression": "maximum"
+      "shortcutName": "下班倒數"
     },
     "files": [
       "index.html",
