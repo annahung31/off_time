@@ -1,0 +1,35 @@
+{
+  "name": "bye-timer",
+  "version": "1.0.0",
+  "description": "下班倒數桌面小工具",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.bye.timer",
+    "productName": "下班倒數",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "下班倒數"
+    },
+    "files": [
+      "index.html",
+      "main.js",
+      "preload.js",
+      "icon.ico"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}
