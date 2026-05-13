@@ -26,22 +26,25 @@ jobs:
 
       - name: Build EXE
         run: |
-          pyinstaller --onefile --windowed `
+          pyinstaller --onedir --windowed `
             --name "下班倒數" `
             --add-data "index.html;." `
             app.py
+
+      - name: Zip output
+        run: Compress-Archive -Path dist\下班倒數 -DestinationPath dist\下班倒數-windows.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: 下班倒數-windows
-          path: dist/下班倒數.exe
+          path: dist/下班倒數-windows.zip
           retention-days: 30
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/下班倒數.exe
+          files: dist/下班倒數-windows.zip
           name: Release ${{ github.ref_name }}
           generate_release_notes: true
